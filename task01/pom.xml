@@ -20,19 +20,36 @@
 
     <dependencies>
         <!-- AWS dependencies-->
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-lambda-java-core -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-lambda-java-events -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-events</artifactId>
+            <version>3.14.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+<!--        <dependency>-->
+<!--            <groupId>com.amazonaws</groupId>-->
+<!--            <artifactId>aws-java-sdk</artifactId>-->
+<!--            <version>1.12.780</version>-->
+<!--        </dependency>-->
         <!--Syndicate annotations-->
         <dependency>
             <groupId>net.sf.aws-syndicate</groupId>
             <artifactId>deployment-configuration-annotations</artifactId>
             <version>${syndicate.java.plugin.version}</version>
         </dependency>
+        <!--        <dependency>-->
+<!--            <groupId>com.aws.syndicate</groupId>-->
+<!--            <artifactId>deployment-configuration-annotations</artifactId>-->
+<!--            <version>1.02</version>-->
+<!--        </dependency>-->
     </dependencies>
-
     <build>
         <sourceDirectory>${src.dir}</sourceDirectory>
         <resources>
