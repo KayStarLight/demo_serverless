@@ -2,80 +2,66 @@ package com.task08;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.openmeteo.sdk.WeatherApiResponse;
 import com.syndicate.deployment.annotations.lambda.LambdaHandler;
 import com.syndicate.deployment.annotations.lambda.LambdaLayer;
 import com.syndicate.deployment.annotations.lambda.LambdaUrlConfig;
+import com.syndicate.deployment.model.Architecture;
+import com.syndicate.deployment.model.ArtifactExtension;
+import com.syndicate.deployment.model.DeploymentRuntime;
+import com.syndicate.deployment.model.RetentionSetting;
 import com.syndicate.deployment.model.lambda.url.AuthType;
 import com.syndicate.deployment.model.lambda.url.InvokeMode;
-import com.task08.layer.OpenMeteoClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 
 @LambdaHandler(
     lambdaName = "api_handler",
-    roleName = "api_handler-role",
-    layers = {"weatherClient"},
-    isPublishVersion = true,
-    aliasName = "${lambdas_alias_name}"
+	roleName = "api_handler-role",
+	isPublishVersion = true,
+	aliasName = "${lambdas_alias_name}",
+	logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED,
+	layers = {"sdk-layer"}
 )
 @LambdaLayer(
-    layerName = "weatherClient",
-    libraries = {"lib/OpenMeteoClient.jar", "lib/commons-lang3-3.14.0.jar"}
+		layerName = "sdk-layer",
+		libraries = {"lib/flatbuffers-java-24.3.25.jar", "lib/sdk-1.10.0.jar"},
+		runtime = DeploymentRuntime.JAVA11,
+		architectures = {Architecture.ARM64},
+		artifactExtension = ArtifactExtension.ZIP
 )
 @LambdaUrlConfig(
-    authType = AuthType.NONE,
-    invokeMode = InvokeMode.BUFFERED
+		authType = AuthType.NONE,
+		invokeMode = InvokeMode.BUFFERED
 )
-public class ApiHandler implements RequestHandler<Object, Map<String, Object>> {
+public class ApiHandler implements RequestHandler<Object, String> {
 
-    private static final OpenMeteoClient weatherClient = new OpenMeteoClient();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+	private static final HttpClient httpClient = HttpClient.newHttpClient();
+	private static final String WEATHER_URL = "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m";
 
-    public Map<String, Object> handleRequest(Object request, Context context) {
+	public String handleRequest(Object request, Context context) {
         try {
-            Map<String, Object> event = (Map<String, Object>) request;
-            String path = (String) event.get("rawPath");
-            Map<String, Object> requestContext = (Map<String, Object>) event.get("requestContext");
-            Map<String, Object> httpContext = (Map<String, Object>) requestContext.get("http");
-            String method = ((String) httpContext.get("method")).toUpperCase();
-
-            // Validate path and method
-            if (!"/weather".equals(path) || !"GET".equals(method)) {
-                Map<String, Object> errorBody = new HashMap<>();
-                errorBody.put("statusCode", 400);
-                errorBody.put("message", String.format("Bad request syntax or unsupported method. Request path: %s. HTTP method: %s", path, method));
-
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("statusCode", 400);
-                errorResponse.put("body", objectMapper.writeValueAsString(errorBody));
-                return errorResponse;
-            }
-
-            // Fetch weather data
-            HttpResponse<String> response = weatherClient.getCurrentWeather();
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("statusCode", response.statusCode());
-            result.put("body", response.body());
-            return result;
-
-        } catch (URISyntaxException | IOException | InterruptedException | RuntimeException e) {
-            context.getLogger().log("Error processing request: " + e.getMessage());
-            Map<String, Object> error = new HashMap<>();
-            error.put("statusCode", 500);
-            error.put("body", "{\"message\":\"Internal server error\"}");
-            return error;
-        } catch (Exception e) {
-            context.getLogger().log("Unexpected error: " + e.getMessage());
-            Map<String, Object> error = new HashMap<>();
-            error.put("statusCode", 500);
-            error.put("body", "{\"message\":\"Internal server error\"}");
-            return error;
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(new URI(WEATHER_URL))
+                .build();
+			HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+			context.getLogger().log(httpResponse.body());
+//			ObjectMapper objectMapper = new ObjectMapper();
+//			WeatherApiResponse weatherApiResponse = objectMapper.readValue(httpResponse.body(), WeatherApiResponse.class);
+//			context.getLogger().log(weatherApiResponse.toString());
+//			return weatherApiResponse.toString();
+			return httpResponse.body();
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-    }
+	}
 }

@@ -10,45 +10,43 @@
 
     <properties>
         <maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>
-        <syndicate.java.plugin.version>1.11.0</syndicate.java.plugin.version>
+        <syndicate.java.plugin.version>1.15.0</syndicate.java.plugin.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <src.dir>jsrc/main/java</src.dir>
-        <resources.dir>jsrc/main/resources</resources.dir>
+        <src.dir>jsrc/main/java/com/task08</src.dir>
+        <resources.dir>src/main/resources</resources.dir>
     </properties>
 
     <dependencies>
-        <!-- AWS dependencies-->
+        <!-- AWS Lambda dependencies -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
             <version>1.2.0</version>
         </dependency>
-        <!--Syndicate annotations-->
+
+        <!-- Syndicate annotations -->
         <dependency>
             <groupId>net.sf.aws-syndicate</groupId>
             <artifactId>deployment-configuration-annotations</artifactId>
             <version>${syndicate.java.plugin.version}</version>
         </dependency>
 
+        <!-- FlatBuffers and Open-Meteo SDK - Marked as 'provided' for Lambda Layer -->
         <dependency>
-            <groupId>com.task08.layer</groupId>
-            <artifactId>openmeteo-client</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/OpenMeteoClient.jar</systemPath>
+            <groupId>com.google.flatbuffers</groupId>
+            <artifactId>flatbuffers-java</artifactId>
+            <version>24.3.25</version>
+            <scope>provided</scope>  <!-- Added scope: provided -->
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.14.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/commons-lang3-3.14.0.jar</systemPath>
+            <groupId>com.open-meteo</groupId>
+            <artifactId>sdk</artifactId>
+            <version>1.10.0</version>
+            <scope>provided</scope>  <!-- Added scope: provided -->
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -57,8 +55,10 @@
             <resource>
                 <directory>${resources.dir}</directory>
             </resource>
-        </resources>        
+        </resources>
+
         <plugins>
+            <!-- Syndicate Plugin -->
             <plugin>
                 <groupId>net.sf.aws-syndicate</groupId>
                 <artifactId>deployment-configuration-maven-plugin</artifactId>
@@ -73,7 +73,6 @@
                     <execution>
                         <id>generate-config</id>
                         <phase>compile</phase>
-                        <inherited>false</inherited>
                         <goals>
                             <goal>gen-deployment-config</goal>
                             <goal>assemble-lambda-layer-files</goal>
@@ -81,6 +80,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Maven Shade Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -107,6 +108,27 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Copy JARs to lib/ for Lambda Layer -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/lib</outputDirectory>
+                            <includeScope>provided</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
