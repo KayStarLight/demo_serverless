@@ -34,46 +34,22 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-events</artifactId>
-            <version>3.11.5</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>bom</artifactId>
-            <version>2.29.44</version>
-            <type>pom</type>
-            <scope>import</scope>
+            <groupId>com.task08.layer</groupId>
+            <artifactId>openmeteo-client</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/OpenMeteoClient.jar</systemPath>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/dynamodb -->
-<!--        <dependency>-->
-<!--            <groupId>software.amazon.awssdk</groupId>-->
-<!--            <artifactId>dynamodb</artifactId>-->
-<!--            <version>2.29.44</version>-->
-<!--        </dependency>-->
-        <!-- JSON Processing -->
+
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.17.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.17.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.17.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-dynamodb</artifactId>
-            <version>1.12.780</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/commons-lang3-3.14.0.jar</systemPath>
         </dependency>
     </dependencies>
 
