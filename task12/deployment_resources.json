@@ -25,9 +25,7 @@
             "cognito-idp:ListUserPools",
             "cognito-idp:ListUserPoolClients",
             "cognito-idp:AdminRespondToAuthChallenge",
-            "cognito-idp:AdminConfirmSignUp",
-            "s3:PutBucketAcl",
-            "s3:GetBucketAcl"
+            "cognito-idp:AdminConfirmSignUp"
           ],
           "Effect": "Allow",
           "Resource": "*"
@@ -92,7 +90,6 @@
     "autoscaling": [],
     "tags": {}
   },
-  
   "api-ui-hoster": {
     "resource_type": "s3_bucket",
     "acl": "public-read",
@@ -104,21 +101,22 @@
           "Sid": "WebSiteHostingGetObject",
           "Effect": "Allow",
           "Principal": "*",
-          "Action": [
-            "s3:GetObject",
-            "s3:PutBucketAcl",
-            "s3:GetBucketAcl"
-          ],
-          "Resource": [
-            "arn:aws:s3:::api-ui-hoster/*"
-          ],
+          "Action": ["s3:GetObject"],
+          "Resource": ["arn:aws:s3:::cmtr-44aaa1af-api-ui-hoster-*/*"],
           "Condition": {
             "IpAddress": {
-              "aws:SourceIp": [
-                "18.197.177.98/32"
-              ]
+              "aws:SourceIp": ["18.197.177.98/32"]
             }
           }
+        },
+        {
+          "Sid": "AllowSyndicateDeploy",
+          "Effect": "Allow",
+          "Principal": {
+            "AWS": "arn:aws:iam::905418349556:role/cmtr_syndicate_task_manager_deployment"
+          },
+          "Action": ["s3:PutBucketAcl", "s3:GetBucketAcl"],
+          "Resource": ["arn:aws:s3:::cmtr-44aaa1af-api-ui-hoster-*"]
         }
       ]
     },
@@ -134,5 +132,22 @@
       "index_document": "index.html",
       "error_document": "error.html"
     }
+  },
+  "syndicate-deploy-role-policy": {
+    "policy_content": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:PutBucketAcl",
+            "s3:GetBucketAcl"
+          ],
+          "Resource": "arn:aws:s3:::cmtr-44aaa1af-api-ui-hoster-*"
+        }
+      ]
+    },
+    "resource_type": "iam_policy",
+    "tags": {}
   }
 }
