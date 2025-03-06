@@ -25,7 +25,9 @@
             "cognito-idp:ListUserPools",
             "cognito-idp:ListUserPoolClients",
             "cognito-idp:AdminRespondToAuthChallenge",
-            "cognito-idp:AdminConfirmSignUp"
+            "cognito-idp:AdminConfirmSignUp",
+            "s3:PutBucketAcl",
+            "s3:GetBucketAcl"
           ],
           "Effect": "Allow",
           "Resource": "*"
@@ -103,7 +105,9 @@
           "Effect": "Allow",
           "Principal": "*",
           "Action": [
-            "s3:GetObject"
+            "s3:GetObject",
+            "s3:PutBucketAcl",
+            "s3:GetBucketAcl"
           ],
           "Resource": [
             "arn:aws:s3:::api-ui-hoster/*"
