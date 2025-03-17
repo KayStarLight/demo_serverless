@@ -25,7 +25,8 @@
             "cognito-idp:ListUserPools",
             "cognito-idp:ListUserPoolClients",
             "cognito-idp:AdminRespondToAuthChallenge",
-            "cognito-idp:AdminConfirmSignUp"
+            "cognito-idp:AdminConfirmSignUp",
+            "s3:PutBucketAcl"
           ],
           "Effect": "Allow",
           "Resource": "*"
@@ -39,9 +40,7 @@
   "api_handler-role": {
     "predefined_policies": [],
     "principal_service": "lambda",
-    "custom_policies": [
-      "lambda-basic-execution"
-    ],
+    "custom_policies": ["lambda-basic-execution"],
     "resource_type": "iam_role",
     "tags": {}
   },
@@ -92,7 +91,6 @@
   },
   "api-ui-hoster": {
     "resource_type": "s3_bucket",
-    "acl": "public-read",
     "cors": [],
     "policy": {
       "Version": "2012-10-17",
@@ -102,29 +100,14 @@
           "Effect": "Allow",
           "Principal": "*",
           "Action": ["s3:GetObject"],
-          "Resource": ["arn:aws:s3:::cmtr-44aaa1af-api-ui-hoster-*/*"],
+          "Resource": ["arn:aws:s3:::api-ui-hoster/*"],
           "Condition": {
             "IpAddress": {
               "aws:SourceIp": ["18.197.177.98/32"]
             }
           }
-        },
-        {
-          "Sid": "AllowSyndicateDeploy",
-          "Effect": "Allow",
-          "Principal": {
-            "AWS": "arn:aws:iam::905418349556:role/cmtr_syndicate_task_manager_deployment"
-          },
-          "Action": ["s3:PutBucketAcl", "s3:GetBucketAcl"],
-          "Resource": ["arn:aws:s3:::cmtr-44aaa1af-api-ui-hoster-*"]
         }
       ]
-    },
-    "public_access_block": {
-      "block_public_acls": false,
-      "ignore_public_acls": false,
-      "block_public_policy": false,
-      "restrict_public_buckets": false
     },
     "tags": {},
     "website_hosting": {
@@ -132,22 +115,5 @@
       "index_document": "index.html",
       "error_document": "error.html"
     }
-  },
-  "syndicate-deploy-role-policy": {
-    "policy_content": {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "s3:PutBucketAcl",
-            "s3:GetBucketAcl"
-          ],
-          "Resource": "arn:aws:s3:::cmtr-44aaa1af-api-ui-hoster-*"
-        }
-      ]
-    },
-    "resource_type": "iam_policy",
-    "tags": {}
   }
 }
