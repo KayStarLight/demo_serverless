@@ -40,7 +40,9 @@
   "api_handler-role": {
     "predefined_policies": [],
     "principal_service": "lambda",
-    "custom_policies": ["lambda-basic-execution"],
+    "custom_policies": [
+      "lambda-basic-execution"
+    ],
     "resource_type": "iam_role",
     "tags": {}
   },
@@ -99,11 +101,17 @@
           "Sid": "WebSiteHostingGetObject",
           "Effect": "Allow",
           "Principal": "*",
-          "Action": ["s3:GetObject"],
-          "Resource": ["arn:aws:s3:::api-ui-hoster/*"],
+          "Action": [
+            "s3:GetObject"
+          ],
+          "Resource": [
+            "arn:aws:s3:::api-ui-hoster/*"
+          ],
           "Condition": {
             "IpAddress": {
-              "aws:SourceIp": ["18.197.177.98/32"]
+              "aws:SourceIp": [
+                "18.197.177.98/32"
+              ]
             }
           }
         }
